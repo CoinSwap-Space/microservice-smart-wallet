@@ -1,0 +1,108 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "prd-microservice-smart-wallet.fullname" . }}
+  labels:
+    {{- include "prd-microservice-smart-wallet.labels" . | nindent 4 }}
+    azure.workload.identity/use: "true"
+spec:
+  serviceAccountName: azure-service-account-prod
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "prd-microservice-smart-wallet.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "prd-microservice-smart-wallet.selectorLabels" . | nindent 8 }}
+        azure.workload.identity/use: "true"
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: azure-service-account-prod
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:            
+            - name: "API_ROOT"
+              value : "../"
+            - name: "USE_COMPRESSION"
+              value : "true"
+
+            - name: "DB_URI"
+              value : "mongodb://10.0.0.8:27017?retryWrites=true&w=majority&maxIdleTimeMS=120000"
+            - name: "NODE_ENV"
+              value : "production"
+            - name: "PORT"
+              value : "80"
+
+            - name: "VAULT_NAME"
+              value: "metapro-prod-secrets"
+            - name: "VAULT_SECRET_NAME"
+              value: "smart-wallet"
+
+            - name: "ETH_CHAIN_ID"
+              value: "1"
+            - name: "BASE_CHAIN_ID"
+              value: "8453"
+            - name: "POLYGON_CHAIN_ID"
+              value: "137"
+              
+            - name: "ETH_NODE_1"
+              value: "https://eth-mainnet.g.alchemy.com/v2/CPvHmlpZ7KeyVaIgGY4rRAyswxsEzusD"
+            - name: "ETH_NODE_2"
+              value: "https://ethereum.publicnode.com"
+            - name: "ETH_NODE_3"
+              value: "https://eth.drpc.org"
+
+            - name: "BASE_NODE_1"
+              value: "https://base-mainnet.g.alchemy.com/v2/CPvHmlpZ7KeyVaIgGY4rRAyswxsEzusD"
+            - name: "BASE_NODE_2"
+              value: "https://mainnet.base.org"
+            - name: "BASE_NODE_3"
+              value: "https://base-rpc.publicnode.com"
+
+            - name: "POLYGON_NODE_1"
+              value: "https://polygon-mainnet.g.alchemy.com/v2/CPvHmlpZ7KeyVaIgGY4rRAyswxsEzusD"
+
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.service.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.service.port }}
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

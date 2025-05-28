@@ -1,0 +1,23 @@
+version: '3'
+services:
+  smart_wallet:
+    container_name: smart-wallet
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    ports:
+      - 8032:8032
+      - 9230:9230
+    env_file: .env
+    restart: always
+    networks:
+      - microservices
+    volumes:
+      - '.:/usr/src/app'
+      - /usr/src/app/node_modules
+    command: ['npm', 'run', 'start:debug']
+
+networks:
+  microservices:
+    external: true
