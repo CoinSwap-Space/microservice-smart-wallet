@@ -59,12 +59,4 @@ export class TransferBodyDto {
   @IsNotEmpty()
   @IsIn(['ERC1155', 'ERC721'])
   tokenStandard: string;
-
-  @Transform(({ value }) => value?.toLowerCase())
-  @IsDefined()
-  @IsString()
-  @IsNotEmpty()
-  @Length(35, 135)
-  @IsAlphanumeric()
-  senderAddress: string;
 }

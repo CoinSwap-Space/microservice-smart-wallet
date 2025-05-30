@@ -200,7 +200,6 @@ export class SmartWalletController implements OnModuleInit {
       amount,
       recipientAddress,
       tokenStandard,
-      senderAddress,
     }: TransferBodyDto,
   ) {
     const db = await this.dynamicDatabaseService.connectToDatabase(
@@ -227,6 +226,7 @@ export class SmartWalletController implements OnModuleInit {
     let tx: ContractTransaction;
 
     try {
+      const senderAddress = this.createWallet(this.smartWalletPK);
       if (tokenStandard === 'ERC721') {
         const Contract = await this.createContract<Erc721>({
           abi: erc721,

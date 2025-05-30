@@ -50,9 +50,9 @@ spec:
               value : "80"
 
             - name: "VAULT_NAME"
-              value: "metapro-prod-secrets"
-            - name: "VAULT_SECRET_NAME"
               value: "smart-wallet"
+            - name: "VAULT_SECRET_NAME"
+              value: "smartwalletKey"
 
             - name: "ETH_CHAIN_ID"
               value: "1"
