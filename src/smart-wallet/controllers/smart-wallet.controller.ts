@@ -36,6 +36,8 @@ export class SmartWalletController implements OnModuleInit {
   private ethChainId: number;
   private baseChainId: number;
   private polygonChainId: number;
+  private arbitrumChainId: number;
+  private bnbChainId: number;
 
   // Nodes
   private nodes: Record<number, string[]> = {};
@@ -51,6 +53,8 @@ export class SmartWalletController implements OnModuleInit {
     this.ethChainId = this.configService.get<number>('ETH_CHAIN_ID');
     this.baseChainId = this.configService.get<number>('BASE_CHAIN_ID');
     this.polygonChainId = this.configService.get<number>('POLYGON_CHAIN_ID');
+    this.arbitrumChainId = this.configService.get<number>('ARBITRUM_CHAIN_ID');
+    this.bnbChainId = this.configService.get<number>('BNB_CHAIN_ID');
 
     this.nodes[this.ethChainId] = [
       this.configService.get<string>('ETH_NODE_1'),
@@ -64,6 +68,12 @@ export class SmartWalletController implements OnModuleInit {
     ];
     this.nodes[this.polygonChainId] = [
       this.configService.get<string>('POLYGON_NODE_1'),
+    ];
+    this.nodes[this.arbitrumChainId] = [
+      this.configService.get<string>('ARBITRUM_NODE_1'),
+    ];
+    this.nodes[this.bnbChainId] = [
+      this.configService.get<string>('BNB_NODE_1'),
     ];
   }
 

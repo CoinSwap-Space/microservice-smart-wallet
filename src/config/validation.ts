@@ -14,6 +14,8 @@ export const validationSchema = Joi.object({
   ETH_CHAIN_ID: Joi.number().required(),
   BASE_CHAIN_ID: Joi.number().required(),
   POLYGON_CHAIN_ID: Joi.number().required(),
+  ARBITRUM_CHAIN_ID: Joi.number().required(),
+  BNB_CHAIN_ID: Joi.number().required(),
 
   ETH_NODE_1: Joi.string().required(),
   ETH_NODE_2: Joi.string().required(),
@@ -24,4 +26,6 @@ export const validationSchema = Joi.object({
   BASE_NODE_3: Joi.string().required(),
 
   POLYGON_NODE_1: Joi.string().required(),
+  ARBITRUM_NODE_1: Joi.string().required(),
+  BNB_NODE_1: Joi.string().required(),
 });

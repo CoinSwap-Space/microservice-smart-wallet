@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "prd-microservice-smart-wallet.fullname" . }}
+  name: {{ include "tst-microservice-smart-wallet.fullname" . }}
   labels:
-    {{- include "prd-microservice-smart-wallet.labels" . | nindent 4 }}
+    {{- include "tst-microservice-smart-wallet.labels" . | nindent 4 }}
     azure.workload.identity/use: "true"
 spec:
-  serviceAccountName: azure-service-account-prod
+  serviceAccountName: azure-service-account-testnet
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "prd-microservice-smart-wallet.selectorLabels" . | nindent 6 }}
+      {{- include "tst-microservice-smart-wallet.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -20,14 +20,14 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "prd-microservice-smart-wallet.selectorLabels" . | nindent 8 }}
+        {{- include "tst-microservice-smart-wallet.selectorLabels" . | nindent 8 }}
         azure.workload.identity/use: "true"
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: azure-service-account-prod
+      serviceAccountName: azure-service-account-testnet
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
@@ -36,16 +36,16 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          env:            
+          env:
             - name: "API_ROOT"
               value : "../"
             - name: "USE_COMPRESSION"
               value : "true"
 
             - name: "DB_URI"
-              value : "mongodb://10.0.0.8:27017?retryWrites=true&w=majority&maxIdleTimeMS=120000"
+              value : "mongodb://10.1.1.4:27017?retryWrites=true&w=majority&maxIdleTimeMS=120000"
             - name: "NODE_ENV"
-              value : "production"
+              value : "testnet"
             - name: "PORT"
               value : "80"
 
@@ -55,37 +55,37 @@ spec:
               value: "smartwalletKey"
 
             - name: "ETH_CHAIN_ID"
-              value: "1"
+              value: "11155111"
             - name: "BASE_CHAIN_ID"
-              value: "8453"
+              value: "84532"
             - name: "POLYGON_CHAIN_ID"
-              value: "137"
+              value: "80002"
             - name: "ARBITRUM_CHAIN_ID"
-              value: "42161"
+              value: "421614"
             - name: "BNB_CHAIN_ID"
-              value: "56"
+              value: "97"
 
             - name: "ETH_NODE_1"
-              value: "https://eth-mainnet.g.alchemy.com/v2/CPvHmlpZ7KeyVaIgGY4rRAyswxsEzusD"
+              value: "https://eth-sepolia.g.alchemy.com/v2/CPvHmlpZ7KeyVaIgGY4rRAyswxsEzusD"
             - name: "ETH_NODE_2"
-              value: "https://ethereum.publicnode.com"
+              value: "https://ethereum-sepolia-rpc.publicnode.com/"
             - name: "ETH_NODE_3"
-              value: "https://eth.drpc.org"
+              value: "https://endpoints.omniatech.io/v1/eth/sepolia/public"
 
             - name: "BASE_NODE_1"
-              value: "https://base-mainnet.g.alchemy.com/v2/CPvHmlpZ7KeyVaIgGY4rRAyswxsEzusD"
+              value: "https://base-sepolia.g.alchemy.com/v2/CPvHmlpZ7KeyVaIgGY4rRAyswxsEzusD"
             - name: "BASE_NODE_2"
-              value: "https://mainnet.base.org"
+              value: "https://sepolia.base.org"
             - name: "BASE_NODE_3"
-              value: "https://base-rpc.publicnode.com"
+              value: "https://base-sepolia.blockpi.network/v1/rpc/public"
 
             - name: "POLYGON_NODE_1"
-              value: "https://polygon-mainnet.g.alchemy.com/v2/CPvHmlpZ7KeyVaIgGY4rRAyswxsEzusD"
+              value: "https://polygon-amoy.g.alchemy.com/v2/CPvHmlpZ7KeyVaIgGY4rRAyswxsEzusD"
             - name: "ARBITRUM_NODE_1"
-              value: "https://arb-mainnet.g.alchemy.com/v2/CPvHmlpZ7KeyVaIgGY4rRAyswxsEzusD"
+              value: "https://arb-sepolia.g.alchemy.com/v2/CPvHmlpZ7KeyVaIgGY4rRAyswxsEzusD"
             - name: "BNB_NODE_1"
-              value: "https://bnb-mainnet.g.alchemy.com/v2/CPvHmlpZ7KeyVaIgGY4rRAyswxsEzusD"
-
+              value: "https://bnb-testnet.g.alchemy.com/v2/CPvHmlpZ7KeyVaIgGY4rRAyswxsEzusD"
+            
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
